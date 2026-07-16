@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
-    bot = Bot(token=settings.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    bot = Bot(token=settings.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML, protect_content=True))
     dp = Dispatcher(storage=MemoryStorage())
 
     for router in get_routers():
