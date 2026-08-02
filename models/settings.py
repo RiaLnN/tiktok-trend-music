@@ -1,12 +1,10 @@
-"""
-Настройки пользователя и справочники для параметров TikTok API
+"""User Settings and References for TikTok API Options
 (tiktok-scraper7 -> GET /feed/search).
 
-Значения enum'ов ниже — это то, что реально принимает эндпоинт
-/feed/search: publish_time и sort_type копируют фильтры, которые
-есть в самом поиске TikTok (период публикации и сортировка по
-релевантности/лайкам).
-"""
+The enum values below are what the endpoint actually takes
+/feed/search: publish_time and sort_type copy filters that
+is in the TikTok search itself (publication period and sorting by
+relevance/likes)."""
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -39,8 +37,8 @@ PUBLISH_TIME_LABELS: dict[PublishTime, str] = {
     PublishTime.LAST_6_MONTHS: "За последние 6 месяцев",
 }
 
-# "" = без ограничения по региону (глобальный поиск).
-# Можно расширять список любыми ISO 3166-1 alpha-2 кодами стран.
+# "" = no region restrictions (global search).
+# You can expand the list with any ISO 3166-1 alpha-2 country codes.
 REGIONS: dict[str, str] = {
     "": "🌍 Без ограничений",
     "US": "🇺🇸 США",
@@ -64,14 +62,14 @@ REGIONS: dict[str, str] = {
 
 @dataclass
 class UserSettings:
-    """Персональные настройки поиска трендов для одного пользователя бота."""
+    """Personal settings for trend search for one bot user."""
 
     keywords: list[str] = field(default_factory=lambda: ["trending"])
-    region: str = ""                          # "" = глобально, иначе код страны, напр. "US"
+    region: str = ""                          # "" = global, otherwise country code, e.g. "US"
     publish_time: PublishTime = PublishTime.LAST_WEEK
     sort_type: SortType = SortType.MOST_LIKED
-    tracks_count: int = 5                      # сколько уникальных треков отдавать за один /trends
-    videos_per_track: int = 3                  # сколько исходных видео показывать под треком
+    tracks_count: int = 5                      # how many unique tracks to give away per one /trends
+    videos_per_track: int = 3                  # how many original videos to show under the track
 
     def to_dict(self) -> dict:
         return {

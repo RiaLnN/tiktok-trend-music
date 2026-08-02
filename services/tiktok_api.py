@@ -1,22 +1,20 @@
-"""
-Тонкая обёртка над tiktok-scraper7 (RapidAPI).
+"""Thin wrapper for tiktok-scraper7 (RapidAPI).
 
-Документация: https://rapidapi.com/tikwm-tikwm-default/api/tiktok-scraper7
+Documentation: https://rapidapi.com/tikwm-tikwm-default/api/tiktok-scraper7
 
-Этот модуль ничего не знает про Telegram и про то, как мы используем
-результат — только выполняет HTTP-запрос и отдаёт разобранный JSON.
-"""
+This module knows nothing about Telegram and how we use it
+the result is just executing an HTTP request and returning the parsed JSON."""
 import httpx
 
 from config import settings as app_settings
 
 
 class TikTokAPIError(Exception):
-    """Ошибка на стороне TikTok API (code != 0 в ответе)."""
+    """Error on the TikTok API side (code != 0 in response)."""
 
 
 class TikTokScraperClient:
-    """Клиент для эндпоинта GET /feed/search сервиса tiktok-scraper7."""
+    """Client for the GET /feed/search endpoint of the tiktok-scraper7 service."""
 
     BASE_URL = "https://tiktok-scraper7.p.rapidapi.com"
 
@@ -45,17 +43,15 @@ class TikTokScraperClient:
         publish_time: str = "0",
         sort_type: str = "0",
     ) -> dict:
-        """
-        GET /feed/search — поиск видео по ключевым словам.
+        """GET /feed/search - search for videos using keywords.
 
-        :param keywords: поисковый запрос
-        :param count: сколько видео вернуть за один запрос (обычно до 30)
-        :param cursor: смещение для пагинации (значение из предыдущего ответа)
-        :param region: код страны ISO 3166-1 alpha-2 (например "US"), "" = без фильтра
-        :param publish_time: период публикации — "0" всё время, "1" сутки,
-            "7" неделя, "30" месяц, "90" 3 месяца, "180" полгода
-        :param sort_type: сортировка — "0" по релевантности, "1" по лайкам
-        """
+        :param keywords: search query
+        :param count: how many videos to return per request (usually up to 30)
+        :param cursor: offset for pagination (value from previous answer)
+        :param region: ISO 3166-1 alpha-2 country code (e.g. "US"), "" = no filter
+        :param publish_time: publication period - "0" all the time, "1" day,
+            "7" week, "30" month, "90" 3 months, "180" six months
+        :param sort_type: sorting - "0" by relevance, "1" by likes"""
         params: dict[str, str] = {
             "keywords": keywords,
             "count": str(count),

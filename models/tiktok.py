@@ -1,24 +1,22 @@
-"""
-Доменные модели, описывающие данные, которые мы получаем от TikTok API:
-трек (музыка) и видео, в котором этот трек звучит.
+"""Domain models that describe the data we receive from the TikTok API:
+track (music) and video in which this track is heard.
 
-Эти классы ничего не знают ни про Telegram, ни про конкретный API —
-их задача только хранить уже разобранные данные.
-"""
+These classes know nothing about Telegram or the specific API -
+their task is only to store already parsed data."""
 from dataclasses import dataclass, field
 from pathlib import Path
 
 
 @dataclass
 class VideoSource:
-    """Одно видео TikTok, в котором звучит конкретный трек."""
+    """One TikTok video that plays a specific track."""
 
     video_id: str
     author_username: str
     author_nickname: str
     cover_url: str
     play_count: int = 0
-    digg_count: int = 0        # лайки
+    digg_count: int = 0        # cursing
     comment_count: int = 0
     share_count: int = 0
     create_time: int = 0
@@ -31,7 +29,7 @@ class VideoSource:
 
 @dataclass
 class Track:
-    """Уникальный трек, найденный в одном или нескольких видео TikTok."""
+    """A unique track found in one or more TikTok videos."""
 
     music_id: str
     title: str
@@ -41,7 +39,7 @@ class Track:
     duration: int = 0
     videos: list[VideoSource] = field(default_factory=list)
 
-    # Заполняется сервисом скачивания после загрузки аудио на диск.
+    # Filled in by the download service after the audio is loaded onto disk.
     local_audio_path: Path | None = None
 
     def add_video(self, video: VideoSource) -> None:

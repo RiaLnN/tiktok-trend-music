@@ -1,22 +1,20 @@
-"""
-Модели подписки: текущий статус пользователя и список доступных тарифов.
+"""Subscription models: current user status and list of available plans.
 
-Подписка продлевается двумя путями, но через один и тот же метод
+The subscription is renewed in two ways, but through the same method
 SubscriptionRepository.extend(...):
-    - пользователь сам оплачивает через Telegram Stars (handlers/subscription.py);
-    - владелец бота выдаёт подписку вручную (handlers/admin.py).
-"""
+    - the user pays himself via Telegram Stars (handlers/subscription.py);
+    - the bot owner issues a subscription manually (handlers/admin.py)."""
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
 
 @dataclass
 class Subscription:
-    """Статус подписки одного пользователя."""
+    """Subscription status of one user."""
 
-    expires_at: datetime | None = None    # None = подписки никогда не было
-    source: str = ""                       # "stars" | "admin" — как была выдана последний раз
-    last_charge_id: str | None = None      # id последнего платежа Stars (для /refund)
+    expires_at: datetime | None = None    # None = never subscribed
+    source: str = ""                       # "stars" | "admin" - how it was issued last time
+    last_charge_id: str | None = None      # id of the last Stars payment (for /refund)
 
     def is_active(self, now: datetime | None = None) -> bool:
         if self.expires_at is None:

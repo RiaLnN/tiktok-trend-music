@@ -1,9 +1,7 @@
-"""
-Админ-команды: ручная выдача/отмена подписки владельцем бота.
+"""Admin commands: manual issuance/cancellation of subscription by the bot owner.
 
-Весь роутер закрыт фильтром IsAdmin — для всех остальных пользователей эти
-команды просто не существуют (хэндлер не срабатывает и не отвечает).
-"""
+The entire router is closed by the IsAdmin filter - for all other users these
+the commands simply do not exist (the handler does not work and does not respond)."""
 from aiogram import Router
 from aiogram.filters import Command, CommandObject
 from aiogram.types import Message

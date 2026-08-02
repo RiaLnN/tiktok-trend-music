@@ -1,4 +1,4 @@
-"""Фильтр, разрешающий хэндлер только владельцу(-ам) бота (см. ADMIN_IDS в .env)."""
+"""Filter to allow handler only to bot owner(s) (see ADMIN_IDS in .env)."""
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
 

@@ -1,10 +1,8 @@
-"""
-Хранилище подписок пользователей.
+"""Storage of user subscriptions.
 
-Тот же подход, что и в SettingsRepository: JSON-файл + asyncio.Lock.
-При росте нагрузки можно заменить на SQLite/Postgres, не трогая вызывающий
-код — он работает только через get/is_active/extend/revoke.
-"""
+Same approach as SettingsRepository: JSON file + asyncio.Lock.
+As the load grows, you can replace it with SQLite/Postgres without touching the caller
+code - it only works through get/is_active/extend/revoke."""
 import asyncio
 import json
 import logging
@@ -35,12 +33,10 @@ class SubscriptionRepository:
     async def extend(
         self, user_id: int, days: int, source: str, charge_id: str | None = None
     ) -> Subscription:
-        """
-        Продлевает подписку на `days` дней.
+        """Extends the subscription for `days` days.
 
-        Если текущая подписка ещё активна — считает от её expires_at (продление
-        "поверх" остатка), иначе — от текущего момента (новая подписка).
-        """
+        If the current subscription is still active, it counts from its expires_at (extension
+        "on top" of the balance), otherwise - from the current moment (new subscription)."""
         async with self._lock:
             data = self._ensure_loaded()
             key = str(user_id)
@@ -63,7 +59,7 @@ class SubscriptionRepository:
             data[str(user_id)] = Subscription()
             self._flush(data)
 
-    # --- Внутреннее ---------------------------------------------------------
+    # --- Internal ---------------------------------------------------------
 
     def _ensure_loaded(self) -> dict[str, Subscription]:
         if self._cache is not None:
@@ -76,7 +72,7 @@ class SubscriptionRepository:
         try:
             raw = json.loads(self._file_path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError) as exc:
-            logger.warning("Не удалось прочитать %s: %s. Начинаю с пустого хранилища.", self._file_path, exc)
+            logger.warning("Failed to read %s: %s. I start with an empty storage.", self._file_path, exc)
             raw = {}
 
         self._cache = {user_id: Subscription.from_dict(payload) for user_id, payload in raw.items()}

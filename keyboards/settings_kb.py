@@ -1,4 +1,4 @@
-"""Инлайн-клавиатуры для меню /settings."""
+"""Inline keyboards for the /settings menu."""
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 

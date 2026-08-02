@@ -1,15 +1,13 @@
-"""
-Бизнес-логика поиска трендов.
+"""Business logic for searching for trends.
 
-TrendsService объединяет TikTokScraperClient (сырые запросы к API)
-и audio_downloader (скачивание файлов), а также отвечает за:
-  - обход нескольких ключевых слов пользователя;
-  - пагинацию внутри одного ключевого слова, пока не наберём
-    нужное количество уникальных треков;
-  - дедупликацию треков по music_id и сбор нескольких видео-источников
-    на трек;
-  - параллельное скачивание аудио для всех найденных треков.
-"""
+TrendsService integrates TikTokScraperClient (raw API requests)
+and audio_downloader (downloading files), and is also responsible for:
+  - bypassing several user keywords;
+  - pagination within one keyword until we type
+    the required number of unique tracks;
+  - deduplication of tracks by music_id and collection of multiple video sources
+    to the track;
+  - parallel downloading of audio for all found tracks."""
 import asyncio
 import logging
 from pathlib import Path
@@ -28,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class TrendsCollectionError(Exception):
-    """Ни один запрос к TikTok API не завершился успешно (все ключевые слова упали)."""
+    """Not a single request to the TikTok API completed successfully (all keywords failed)."""
 
 
 class TrendsService:
@@ -40,10 +38,10 @@ class TrendsService:
     async def close(self) -> None:
         await self._download_client.aclose()
 
-    # --- Поиск треков -----------------------------------------------------
+    # --- Search for tracks -------------------------------------------------------
 
     async def collect_trending_tracks(self, user_settings: UserSettings) -> list[Track]:
-        """Возвращает до user_settings.tracks_count уникальных треков по настройкам пользователя."""
+        """Returns up to user_settings.tracks_count of unique tracks by user settings."""
         keywords = user_settings.keywords or [DEFAULT_KEYWORD]
         tracks: dict[str, Track] = {}
         successful_requests = 0
@@ -53,14 +51,14 @@ class TrendsService:
                 successful_requests += 1
 
         if successful_requests == 0:
-            raise TrendsCollectionError("Все запросы к TikTok API завершились ошибкой")
+            raise TrendsCollectionError("All requests to TikTok API failed")
 
         return list(tracks.values())[: user_settings.tracks_count]
 
     async def _collect_for_keyword(
         self, keyword: str, user_settings: UserSettings, tracks: dict[str, Track]
     ) -> bool:
-        """Опрашивает API по одному ключевому слову (с пагинацией). Возвращает успех запроса."""
+        """Queries the API for one keyword (with pagination). Returns the success of the request."""
         cursor = 0
         got_successful_response = False
 
@@ -75,7 +73,7 @@ class TrendsService:
                     sort_type=user_settings.sort_type.value,
                 )
             except (httpx.HTTPError, TikTokAPIError) as exc:
-                logger.warning("Ошибка запроса TikTok API по слову %r: %s", keyword, exc)
+                logger.warning("TikTok API request error for word %r: %s", keyword, exc)
                 break
 
             got_successful_response = True
@@ -100,12 +98,12 @@ class TrendsService:
         play_url = music.get("play")
 
         if not music_id or not play_url:
-            return  # у видео нет трека с рабочей ссылкой — пропускаем
+            return  # the video does not have a track with a working link - skip it
 
         track = tracks.get(music_id)
         if track is None:
             if len(tracks) >= tracks_limit:
-                return  # новый трек не поместится в лимит — но старые ещё можно дополнять
+                return  # the new track will not fit into the limit - but the old ones can still be supplemented
             track = Track(
                 music_id=music_id,
                 title=music.get("title") or "Неизвестный трек",
@@ -117,7 +115,7 @@ class TrendsService:
             tracks[music_id] = track
 
         if len(track.videos) >= videos_per_track:
-            return  # для этого трека уже набрали достаточно видео-источников
+            return  # We have already collected enough video sources for this track
 
         author_info = video.get("author") or {}
         track.add_video(
@@ -134,21 +132,21 @@ class TrendsService:
             )
         )
 
-    # --- Скачивание аудио ---------------------------------------------------
+    # ---Download audio ------------------------------------------------------------------
 
     async def download_tracks_audio(self, tracks: list[Track]) -> None:
-        """Параллельно скачивает аудио для всех треков и проставляет track.local_audio_path."""
+        """Simultaneously downloads audio for all tracks and sets track.local_audio_path."""
         await asyncio.gather(*(self._download_one(track) for track in tracks))
 
     async def _download_one(self, track: Track) -> None:
         filename = safe_filename(f"{track.author} - {track.title}") + ".mp3"
-        # music_id в начале имени файла защищает от коллизий при одинаковых названиях.
+        # music_id at the beginning of the file name protects against collisions with the same names.
         destination = self._audio_dir / f"{track.music_id}_{filename}"
 
         try:
             await download_file(self._download_client, track.play_url, destination)
         except httpx.HTTPError as exc:
-            logger.warning("Не удалось скачать трек %r: %s", track.title, exc)
+            logger.warning("Failed to download track %r: %s", track.title, exc)
             return
 
         track.local_audio_path = destination

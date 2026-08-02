@@ -1,4 +1,4 @@
-"""Вспомогательные функции форматирования: имена файлов и подписи к сообщениям."""
+"""Formatting aids: file names and message signatures."""
 import re
 from html import escape
 
@@ -9,14 +9,14 @@ _ILLEGAL_FILENAME_CHARS = re.compile(r'[\\/*?:"<>|]')
 
 
 def safe_filename(name: str, fallback: str = "audio", max_length: int = 100) -> str:
-    """Убирает символы, недопустимые в именах файлов на большинстве ОС."""
+    """Removes characters that are not allowed in file names on most operating systems."""
     cleaned = _ILLEGAL_FILENAME_CHARS.sub("", name).strip()
     cleaned = cleaned or fallback
     return cleaned[:max_length]
 
 
 def format_count(value: int) -> str:
-    """Компактное представление числа: 12345 -> '12.3K', 2_500_000 -> '2.5M'."""
+    """Compact representation of a number: 12345 -> '12.3K', 2_500_000 -> '2.5M'."""
     if value >= 1_000_000:
         return f"{value / 1_000_000:.1f}M"
     if value >= 1_000:
@@ -25,12 +25,12 @@ def format_count(value: int) -> str:
 
 
 def format_audio_caption(track: Track) -> str:
-    """Подпись, которая идёт вместе с аудиофайлом трека."""
+    """The signature that comes with the track's audio file."""
     return f"🎵 <b>{escape(track.title)}</b>\n👤 {escape(track.author)}"
 
 
 def format_video_caption(track: Track) -> str:
-    """Подпись со списком видео-источников трека (со ссылками и статистикой)."""
+    """Signature with a list of video sources of the track (with links and statistics)."""
     lines = [f"🎬 <b>Видео с треком «{escape(track.title)}»</b>"]
 
     for i, video in enumerate(track.videos, start=1):
@@ -42,7 +42,7 @@ def format_video_caption(track: Track) -> str:
 
 
 def format_subscription_status(sub: Subscription) -> str:
-    """Человекочитаемый статус подписки — для /mysub, /subscribe, /subinfo."""
+    """Human-readable subscription status - for /mysub, /subscribe, /subinfo."""
     if sub.is_active():
         return f"✅ Подписка активна до {sub.expires_at:%d.%m.%Y %H:%M} UTC"
     if sub.expires_at is not None:

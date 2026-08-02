@@ -1,14 +1,12 @@
-"""
-Подписка и оплата через Telegram Stars.
+"""Subscription and payment via Telegram Stars.
 
-Поток оплаты:
-  /subscribe -> кнопка с тарифом -> send_invoice (currency="XTR")
-  -> pre_checkout_query (обязаны подтвердить в течение 10 секунд)
-  -> successful_payment (продлеваем подписку в SubscriptionRepository)
+Payment flow:
+  /subscribe -> rate button -> send_invoice (currency="XTR")
+  -> pre_checkout_query (must confirm within 10 seconds)
+  -> successful_payment (renew subscription in SubscriptionRepository)
 
-Никаких дополнительных настроек платёжного провайдера в BotFather для Stars
-не нужно — provider_token для них всегда пустая строка.
-"""
+No additional payment provider settings in BotFather for Stars
+no need - provider_token is always an empty string for them."""
 import logging
 
 from aiogram import Bot, F, Router
@@ -24,18 +22,16 @@ from utils.formatting import format_subscription_status
 logger = logging.getLogger(__name__)
 router = Router(name="subscription")
 
-# invoice_payload ограничен 1-128 байтами и не показывается пользователю —
-# кладём в него только id тарифа с небольшим префиксом для читаемости логов.
+# invoice_payload is limited to 1-128 bytes and is not shown to the user -
+# We put in it only the tariff id with a small prefix for the readability of the logs.
 _PAYLOAD_PREFIX = "sub_"
 
 
 async def ensure_active_subscription(message: Message, subscription_repo: SubscriptionRepository) -> bool:
-    """
-    Проверка доступа для платных команд (см. handlers/trends.py).
+    """Checking access for paid teams (see handlers/trends.py).
 
-    Возвращает True, если можно продолжать выполнение хэндлера. Если подписки
-    нет — сама объясняет пользователю, что делать, и возвращает False.
-    """
+    Returns True if execution of the handler can continue. If subscriptions
+    no - it explains to the user what to do and returns False."""
     if not message.from_user: return False
     if await subscription_repo.is_active(message.from_user.id):
         return True
@@ -64,8 +60,8 @@ async def cmd_mysub(message: Message, subscription_repo: SubscriptionRepository)
 
 @router.message(Command("paysupport"))
 async def cmd_paysupport(message: Message) -> None:
-    # Telegram требует, чтобы боты, принимающие оплату за цифровые товары
-    # и услуги, поддерживали команду /paysupport.
+    # Telegram requires bots that accept payment for digital goods
+    # and services, supported by the /paysupport team.
     await message.answer(
         "По вопросам оплаты Stars пишите в поддержку.\n"
         "Вернуть последний платёж самостоятельно можно командой /refund."
@@ -103,7 +99,7 @@ async def cb_buy_plan(callback: CallbackQuery, callback_data: SubscriptionCB, bo
         payload=f"{_PAYLOAD_PREFIX}{plan.plan_id}",
         currency="XTR",
         prices=[LabeledPrice(label=plan.title, amount=plan.stars_price)],
-        provider_token="",  # для Telegram Stars токен провайдера должен быть пустым
+        provider_token="",  # for Telegram Stars the provider token must be empty
     )
     await callback.answer()
 
@@ -124,7 +120,7 @@ async def process_successful_payment(message: Message, subscription_repo: Subscr
     plan = find_plan(payment.invoice_payload.removeprefix(_PAYLOAD_PREFIX))
 
     if plan is None:
-        logger.error("Успешный платёж с нераспознанным payload: %r", payment.invoice_payload)
+        logger.error("Successful payment with unrecognized payload: %r", payment.invoice_payload)
         await message.answer("Оплата прошла, но тариф не распознан. Напишите /paysupport.")
         return
 

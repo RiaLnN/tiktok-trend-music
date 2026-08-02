@@ -1,21 +1,21 @@
-"""Мелкие константы, на которые ссылаются несколько модулей."""
+"""Small constants that are referenced by multiple modules."""
 
-# Ключевое слово по умолчанию, если пользователь ещё не задал свои.
+# The default keyword if the user has not yet specified his own.
 DEFAULT_KEYWORD = "trending"
 
-# Сколько видео запрашивать у API за один вызов /feed/search (максимум,
-# который стабильно отдаёт tiktok-scraper7 за один запрос).
+# How many videos to request from the API in one /feed/search call (maximum
+# which consistently returns tiktok-scraper7 in one request).
 SEARCH_PAGE_SIZE = 30
 
-# Не уходим в бесконечную пагинацию по одному ключевому слову — это
-# и лишние деньги за запросы к RapidAPI, и риск словить рейт-лимит.
+# We don’t go into endless pagination for one keyword - this is
+# and extra money for requests to RapidAPI, and the risk of hitting the rate limit.
 MAX_PAGES_PER_KEYWORD = 3
 
-# Пресеты для инлайн-кнопок в /settings.
+# Presets for inline buttons in /settings.
 TRACK_COUNT_OPTIONS = [3, 5, 10, 15]
 VIDEOS_PER_TRACK_OPTIONS = [1, 2, 3, 5]
 
-# Telegram ограничивает callback_data 64 байтами. Ключевое слово попадает
-# в callback_data кнопки удаления ("stg:remove_keyword:<слово>"), а кириллица
-# в UTF-8 занимает 2 байта на символ — поэтому ограничиваем длину с запасом.
+# Telegram limits callback_data to 64 bytes. Keyword hits
+# in callback_data there are delete buttons ("stg:remove_keyword:<word>"), and the Cyrillic
+# in UTF-8 it takes 2 bytes per character - so we limit the length with a margin.
 MAX_KEYWORD_LENGTH = 20

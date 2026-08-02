@@ -1,4 +1,4 @@
-"""Точка входа: собирает бота из конфига, сервисов и роутеров."""
+"""Entry point: collects the bot from the config, services and routers."""
 import asyncio
 import logging
 
@@ -35,7 +35,7 @@ async def main() -> None:
 
     try:
         await bot.delete_webhook(drop_pending_updates=True)
-        logger.info("Бот запущен")
+        logger.info("Bot launched")
         await dp.start_polling(
             bot,
             repo=repo,
@@ -52,4 +52,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Бот остановлен")
+        logger.info("Bot stopped")

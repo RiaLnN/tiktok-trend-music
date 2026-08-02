@@ -1,11 +1,9 @@
-"""
-Обработчики команды /settings.
+"""/settings command handlers.
 
-Меню строится как дерево инлайн-клавиатур: главное меню -> подменю
-конкретного параметра -> выбор значения -> снова главное меню.
-Все переходы используют edit_text/edit_reply_markup, чтобы не заваливать
-чат новыми сообщениями при каждом клике.
-"""
+The menu is built like a tree of inline keyboards: main menu -> submenu
+specific parameter -> select a value -> again the main menu.
+All transitions use edit_text/edit_reply_markup so as not to overwhelm
+Chat with new messages with every click."""
 import logging
 
 from aiogram import F, Router
@@ -60,7 +58,7 @@ async def cb_close(callback: CallbackQuery) -> None:
     await callback.answer()
 
 
-# --- Ключевые слова ---------------------------------------------------------
+# --- Keywords ---------------------------------------------------------
 
 @router.callback_query(SettingsCB.filter(F.action == "keywords"))
 async def cb_keywords(callback: CallbackQuery, repo: SettingsRepository) -> None:
@@ -117,7 +115,7 @@ async def process_new_keyword(message: Message, state: FSMContext, repo: Setting
     await message.answer(_summary_text(user_settings), reply_markup=main_menu_kb(user_settings))
 
 
-# --- Страна ------------------------------------------------------------------
+# --- Page -------------------------------------------------------------------
 
 @router.callback_query(SettingsCB.filter(F.action == "region"))
 async def cb_region(callback: CallbackQuery) -> None:
@@ -133,7 +131,7 @@ async def cb_set_region(callback: CallbackQuery, callback_data: SettingsCB, repo
     await cb_main_menu(callback, repo)
 
 
-# --- Период публикации ---------------------------------------------------------
+# --- Publication period ---------------------------------------------------------
 
 @router.callback_query(SettingsCB.filter(F.action == "period"))
 async def cb_period(callback: CallbackQuery) -> None:
@@ -149,7 +147,7 @@ async def cb_set_period(callback: CallbackQuery, callback_data: SettingsCB, repo
     await cb_main_menu(callback, repo)
 
 
-# --- Сортировка ----------------------------------------------------------------
+# --- Sorting ----------------------------------------------------------------
 
 @router.callback_query(SettingsCB.filter(F.action == "sort"))
 async def cb_sort(callback: CallbackQuery) -> None:
@@ -165,7 +163,7 @@ async def cb_set_sort(callback: CallbackQuery, callback_data: SettingsCB, repo: 
     await cb_main_menu(callback, repo)
 
 
-# --- Количество треков / видео на трек ------------------------------------------
+# --- Number of tracks/videos per track ------------------------------------------
 
 @router.callback_query(SettingsCB.filter(F.action == "count"))
 async def cb_count(callback: CallbackQuery) -> None:

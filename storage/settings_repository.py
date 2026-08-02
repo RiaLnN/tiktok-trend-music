@@ -1,11 +1,9 @@
-"""
-Хранилище пользовательских настроек.
+"""Storage of user settings.
 
-Простой JSON-файл + асинхронный lock — этого более чем достаточно
-для личного/небольшого бота. Интерфейс (get/save) намеренно узкий,
-чтобы при необходимости можно было безболезненно заменить реализацию
-на SQLite/Redis/Postgres, не трогая остальной код бота.
-"""
+A simple JSON file + asynchronous lock is more than enough
+for a personal/small bot. The interface (get/save) is intentionally narrow,
+so that, if necessary, you can painlessly replace the implementation
+on SQLite/Redis/Postgres without touching the rest of the bot code."""
 import asyncio
 import json
 import logging
@@ -37,7 +35,7 @@ class SettingsRepository:
             data[str(user_id)] = user_settings
             self._flush(data)
 
-    # --- Внутреннее ---------------------------------------------------------
+    # --- Internal ---------------------------------------------------------
 
     def _ensure_loaded(self) -> dict[str, UserSettings]:
         if self._cache is not None:
@@ -50,7 +48,7 @@ class SettingsRepository:
         try:
             raw = json.loads(self._file_path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError) as exc:
-            logger.warning("Не удалось прочитать %s: %s. Начинаю с пустого хранилища.", self._file_path, exc)
+            logger.warning("Failed to read %s: %s. I start with an empty storage.", self._file_path, exc)
             raw = {}
 
         self._cache = {user_id: UserSettings.from_dict(payload) for user_id, payload in raw.items()}

@@ -1,4 +1,4 @@
-"""Обработчик команды /trends — основной сценарий бота."""
+"""The /trends command handler is the main bot script."""
 import asyncio
 import logging
 
@@ -17,8 +17,8 @@ from utils.formatting import format_audio_caption, format_video_caption
 logger = logging.getLogger(__name__)
 router = Router(name="trends")
 
-# Небольшая пауза между отправкой треков, чтобы не упереться в лимиты Telegram
-# на количество сообщений в один чат.
+# A short pause between sending tracks, so as not to run into Telegram limits
+# by the number of messages in one chat.
 DELAY_BETWEEN_TRACKS = 0.5
 
 
@@ -50,7 +50,7 @@ async def cmd_trends(
         )
         return
     except Exception:
-        logger.exception("Непредвиденная ошибка при получении трендов")
+        logger.exception("Unexpected error while retrieving trends")
         await status.edit_text("❌ Произошла непредвиденная ошибка. Попробуйте позже.")
         return
 
@@ -92,7 +92,7 @@ async def _send_track(message: Message, track: Track) -> None:
 
 
 async def _send_source_videos(message: Message, track: Track) -> None:
-    """Присылает обложки видео-источников трека вместе со ссылками и статистикой."""
+    """Sends covers of video sources of the track along with links and statistics."""
     photos = [video for video in track.videos if video.cover_url]
     caption = format_video_caption(track)
 
@@ -108,6 +108,6 @@ async def _send_source_videos(message: Message, track: Track) -> None:
             ]
             await message.answer_media_group(media_group) # type: ignore
     except TelegramBadRequest as exc:
-        # TikTok иногда отдаёт битые/просроченные ссылки на обложки — не роняем бота из-за этого.
-        logger.warning("Не удалось отправить превью видео для трека %r: %s", track.title, exc)
+        # TikTok sometimes gives broken/expired links to covers - we don’t drop the bot because of this.
+        logger.warning("Failed to send video preview for track %r: %s", track.title, exc)
         await message.answer(caption, disable_web_page_preview=True)

@@ -1,4 +1,4 @@
-"""Клавиатура выбора тарифа подписки."""
+"""Keyboard for selecting a subscription tariff."""
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 

@@ -2,17 +2,16 @@ from aiogram.filters.callback_data import CallbackData
 
 
 class SettingsCB(CallbackData, prefix="stg"):
-    """Полезная нагрузка callback-кнопок меню /settings.
+    """Payload of the /settings menu callback buttons.
 
-    action — что делает кнопка ("menu", "region", "set_region", ...)
-    value  — дополнительное значение (код региона, ключевое слово и т.д.)
-    """
+    action - what the button does ("menu", "region", "set_region", ...)
+    value - additional value (region code, keyword, etc.)"""
 
     action: str
     value: str = ""
 
 
 class SubscriptionCB(CallbackData, prefix="sub"):
-    """Полезная нагрузка кнопок выбора тарифа подписки в /subscribe."""
+    """Payload of subscription tariff selection buttons in /subscribe."""
 
     plan_id: str
